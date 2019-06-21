@@ -9,13 +9,15 @@ var moment = require("moment");
 var inquirer = require("inquirer");
 var Spotify = require("node-spotify-api");
 
+var command = process.argv[2];
+var searchTerm = process.argv[3];
 
 //require variable
 var keys = require("./keys.js");  // code required to import the keys.js file and store it in a variable
 console.log(keys);
 var spotify = new Spotify(keys.spotify); // to access your keys information
 
-var options = ["concert-this", "spotify-this-song", "movie-this", "do-what-it-says", "do-what-it-says"];
+var options = ["concert-this", "spotify-this-song", "movie-this", "do-what-it-says"];
 // var search = process.argv.slice(3).join(" ");
 // var inputType = process.argv[2];
 
@@ -162,8 +164,14 @@ selectOption();
 
 var whatUserSay = function () {
     fs.readFile("random.txt", "utf8", function (error, data) {
-        if (!error);
-        console.log(data.toString());
-        var perCommand = data.toString().split(',');
+        if (error) {
+            return console.log(error);
+        }
+        var inputs = data.split(",");
+        console.log(inputs);
+        command = inputs[0];
+        searchTerm = inputs[1];
+
+        selectOption();
     });
 } 
