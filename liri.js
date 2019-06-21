@@ -2,15 +2,14 @@
 require("dotenv").config();
 
 //require packages
-
 var fs = require("fs");
 var axios = require("axios");
 var moment = require("moment");
 var inquirer = require("inquirer");
 var Spotify = require("node-spotify-api");
 
-var command = process.argv[2];
-var searchTerm = process.argv[3];
+// var command = process.argv[2];
+var searchTerm;
 
 //require variable
 var keys = require("./keys.js");  // code required to import the keys.js file and store it in a variable
@@ -18,8 +17,6 @@ console.log(keys);
 var spotify = new Spotify(keys.spotify); // to access your keys information
 
 var options = ["concert-this", "spotify-this-song", "movie-this", "do-what-it-says"];
-// var search = process.argv.slice(3).join(" ");
-// var inputType = process.argv[2];
 
 var spotify = new Spotify({
     id: keys.spotify.id,
@@ -28,7 +25,8 @@ var spotify = new Spotify({
 // console.log(data);
 
 // band In town function
-var bandsintown = function () {
+var bandsintown = function (search) {
+    //if search exists then straight to axios call
     inquirer
         .prompt([
             {
@@ -38,6 +36,7 @@ var bandsintown = function () {
             }
         ])
         .then(function (inquirerResponse) {
+            console.log(inquirerResponse.artist);
             if (inquirerResponse.artist) {
                 var queryURL = "https://rest.bandsintown.com/artists/" + inquirerResponse.artist + "/events?app_id=codingbootcamp";
             }
@@ -60,37 +59,54 @@ var bandsintown = function () {
 } //bandsInTown function close
 
 //spotify
-var spotifySong = function () {
-    inquirer
-        .prompt([
-            {
-                type: "input",
-                message: "Which Song info do you want",
-                name: "songName"
+var spotifySong = function (search) {
+
+    if (search) {
+        spotify.search({ type: "track", query: "'" + search + "'", limit: 1 }, function (err, data) {
+
+            // console.log(data.tracks.items[0]);
+            var songResult = data.tracks.items[0];
+            console.log("Artists: " + songResult.artists[0].name + "\n\n" +
+                "Name of the song: " + songResult.name + "\n\n" +
+                "Spotify link of the song: " + songResult.external_urls.spotify + "\n\n" +
+                "Name of the album: " + songResult.album.name + "\n\n"
+            );
+            selectOption()
+
+        });
+    }
+    else {
+        inquirer
+            .prompt([
+                {
+                    type: "input",
+                    message: "Which Song info do you want",
+                    name: "songName"
+                }
+            ]).then(function (resultSongInfo) {
+
+                spotify.search({ type: "track", query: "'" + resultSongInfo.songName + "'", limit: 1 }, function (err, data) {
+
+                    // console.log(data.tracks.items[0]);
+
+                    var songResult = data.tracks.items[0];
+
+                    console.log("Artists: " + songResult.artists[0].name + "\n\n" +
+                        "Name of the song: " + songResult.name + "\n\n" +
+                        "Spotify link of the song: " + songResult.external_urls.spotify + "\n\n" +
+                        "Name of the album: " + songResult.album.name + "\n\n"
+                    );
+                    selectOption()
+
+                });
             }
-        ]).then(function (resultSongInfo) {
 
-            spotify.search({ type: "track", query: "'" + resultSongInfo.songName + "'", limit: 1 }, function (err, data) {
-
-                // console.log(data.tracks.items[0]);
-
-                var songResult = data.tracks.items[0];
-
-                console.log("Artists: " + songResult.artists[0].name + "\n\n" +
-                    "Name of the song: " + songResult.name + "\n\n" +
-                    "Spotify link of the song: " + songResult.external_urls.spotify + "\n\n" +
-                    "Name of the album: " + songResult.album.name + "\n\n"
-                );
-                selectOption()
-
-            });
-        }
-
-        )
+            )
+    }
 }
 
 // movies function
-var movies = function () {
+var movies = function (cmd) {
 
     inquirer
         .prompt([
@@ -140,7 +156,7 @@ var selectOption = function () {
     inquirer
         .prompt([
             {
-                type: "rawlist",
+                type: "list",
                 message: "Select option",
                 choices: options,
                 name: "userOption"
@@ -169,9 +185,17 @@ var whatUserSay = function () {
         }
         var inputs = data.split(",");
         console.log(inputs);
-        command = inputs[0];
+        var command = inputs[0];
         searchTerm = inputs[1];
 
-        selectOption();
+        if (command === options[0]) {
+            bandsintown();
+
+        } else if (command === options[1]) {
+            spotifySong(searchTerm);
+        }
+        else if (command === options[2]) {
+            movies();
+        }
     });
 } 
