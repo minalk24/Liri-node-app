@@ -12,6 +12,7 @@ var Spotify = require("node-spotify-api");
 
 //require variable
 var keys = require("./keys.js");  // code required to import the keys.js file and store it in a variable
+console.log(keys);
 var spotify = new Spotify(keys.spotify); // to access your keys information
 
 // movies function
@@ -28,9 +29,11 @@ var movies = function () {
 
             if (resultMovie.NameOfMovie) {
                 var queryURL = "http://www.omdbapi.com/?t=" + resultMovie.NameOfMovie.split(" ").join("+") + "&y=&plot=short&apikey=trilogy";
-                console.log(queryURL);
+                // console.log(queryURL);
+            }else{
+                var queryURL = "http://www.omdbapi.com/?t=Mr.+Nobody&y=&plot=short&apikey=trilogy"
             }
-            Í
+
             axios.get(queryURL)
                 .then(
                     function (responseMovie) {
@@ -44,6 +47,7 @@ var movies = function () {
                             "Plot of the movie: " + responseMovie.data.Plot + "\n\n" +
                             "Actors in the movie: " + responseMovie.data.Actors + "\n\n"
                         );
+                     
                     })
                 .catch(function () {
 
@@ -68,10 +72,11 @@ var bandsintown = function () {
         ])
         .then(function (inquirerResponse) {
             if (inquirerResponse.artist) {
-                var queryURL = "https://rest.bandsintown.com/artists/" + artist + "/events?app_id=codingbootcamp";
+                var queryURL = "https://rest.bandsintown.com/artists/" + inquirerResponse.artist + "/events?app_id=codingbootcamp";
             }
             axios.get(queryURL)
                 .then(function (responseAxios) {
+
                     if (responseAxios.data.length === 0) {
                         console.log("Sorry Enter correct Band Name or Artist Name");
                     } else {
@@ -79,9 +84,49 @@ var bandsintown = function () {
                             console.log(" The name of the venue is :" + responseAxios.data[i].venue.name + "\n\n" +
                                 "Venue location : " + responseAxios.data[i].venue.city + "\n\n" +
                                 "Date of the Event" + moment(responseAxios.data[i].datetime).format("MM/DD/YYYY HH:mm A")
-                            );
+                            ); //console close
                         } // for loop close
                     } //else close
-                }) //promise for axios close
+                  
+                }); //promise for axios close
         }); //promise for inquirer close
 } //bandsInTown function close
+
+// var inputType = process.argv[2];
+
+var spotify = new Spotify({
+    id: keys.spotify.id,
+    secret: keys.spotify.secret
+})
+// console.log(data);
+
+var spotifySong = function () {
+    inquirer
+        .prompt([
+            {
+                type: "input",
+                message: "Which Song info do you want",
+                name: "songName"
+            }
+        ]).then(function (resultSongInfo) {
+           
+            spotify.search({ type: "track", query: "'" + resultSongInfo.songName + "'", limit: 1 }, function (err, data) {
+
+                console.log(data.tracks.items[0]);
+
+                var songResult = data.tracks.items[0];
+
+                console.log("Artists: " + songResult.artists[0].name + "\n\n" +
+                    "Name of the song: " + songResult.name + "\n\n" +
+                    "Spotify link of the song: " + songResult.external_urls.spotify + "\n\n" +
+                    "Name of the album: " + songResult.album.name + "\n\n"
+                );
+               
+
+            });
+        }
+
+        )
+}
+
+// console.log(`This is my Spotify id ${keys.spotify.id}`);
