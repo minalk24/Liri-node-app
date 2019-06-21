@@ -47,7 +47,7 @@ var movies = function () {
                             "Plot of the movie: " + responseMovie.data.Plot + "\n\n" +
                             "Actors in the movie: " + responseMovie.data.Actors + "\n\n"
                         );
-                     
+                        selectOption()
                     })
                 .catch(function () {
 
@@ -87,10 +87,41 @@ var bandsintown = function () {
                             ); //console close
                         } // for loop close
                     } //else close
-                  
+                    selectOption()
                 }); //promise for axios close
         }); //promise for inquirer close
 } //bandsInTown function close
+
+
+var options = ["concert-this", "spotify-this-song", "movie-this", "do-what-it-says"];
+// var search = process.argv.slice(3).join(" ");
+
+
+function selectOption() {
+    // ask the user to choose an option
+    inquirer
+        .prompt([
+            {
+                type: "rawlist",
+                message: "Select option",
+                choices: options,
+                name: "userOption"
+            }
+        ]).then(function (resultOption) {
+            //node liri.js movie-this  enter-movie-name
+            if (resultOption.userOption === options[0]) {
+                bandsintown();
+                //node liri.js movie-this  enter-band/artist-name
+            } else if (resultOption.userOption === options[2]) {
+
+                movies();
+            }
+            else if (resultOption.userOption === options[1]) {
+                spotifySong();
+            }
+        });
+}
+selectOption();
 
 // var inputType = process.argv[2];
 
@@ -121,7 +152,7 @@ var spotifySong = function () {
                     "Spotify link of the song: " + songResult.external_urls.spotify + "\n\n" +
                     "Name of the album: " + songResult.album.name + "\n\n"
                 );
-               
+                selectOption()
 
             });
         }
