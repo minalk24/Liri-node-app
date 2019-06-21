@@ -15,50 +15,15 @@ var keys = require("./keys.js");  // code required to import the keys.js file an
 console.log(keys);
 var spotify = new Spotify(keys.spotify); // to access your keys information
 
-// movies function
-var movies = function () {
+var options = ["concert-this", "spotify-this-song", "movie-this", "do-what-it-says", "do-what-it-says"];
+// var search = process.argv.slice(3).join(" ");
+// var inputType = process.argv[2];
 
-    inquirer
-        .prompt([
-            {
-                type: "input",
-                message: "Which movie do you want to know about",
-                name: "NameOfMovie"
-            }
-        ]).then(function (resultMovie) {
-
-            if (resultMovie.NameOfMovie) {
-                var queryURL = "http://www.omdbapi.com/?t=" + resultMovie.NameOfMovie.split(" ").join("+") + "&y=&plot=short&apikey=trilogy";
-                // console.log(queryURL);
-            }else{
-                var queryURL = "http://www.omdbapi.com/?t=Mr.+Nobody&y=&plot=short&apikey=trilogy"
-            }
-
-            axios.get(queryURL)
-                .then(
-                    function (responseMovie) {
-
-                        console.log("Title of the movie: " + responseMovie.data.Title + "\n\n" +
-                            "Year the movie came out: " + responseMovie.data.Year + "\n\n" +
-                            "IMDB Rating of the movie: " + responseMovie.data.Rated + "\n\n" +
-                            "Rotten Tomatoes Rating of the movie: " + responseMovie.data.Ratings[1].Value + "\n\n" +
-                            "Country where the movie was produced: " + responseMovie.data.Country + "\n\n" +
-                            "Language of the movie: " + responseMovie.data.Language + "\n\n" +
-                            "Plot of the movie: " + responseMovie.data.Plot + "\n\n" +
-                            "Actors in the movie: " + responseMovie.data.Actors + "\n\n"
-                        );
-                        selectOption()
-                    })
-                .catch(function () {
-
-                    console.log("Enter Correct movie Name");
-
-                    if (NameOfMovie === "Mr. Nobody") {
-                        console.log("If you havn't watch this movie, Watch it")
-                    }
-                });
-        });
-}
+var spotify = new Spotify({
+    id: keys.spotify.id,
+    secret: keys.spotify.secret
+})
+// console.log(data);
 
 // band In town function
 var bandsintown = function () {
@@ -92,45 +57,7 @@ var bandsintown = function () {
         }); //promise for inquirer close
 } //bandsInTown function close
 
-
-var options = ["concert-this", "spotify-this-song", "movie-this", "do-what-it-says"];
-// var search = process.argv.slice(3).join(" ");
-
-
-function selectOption() {
-    // ask the user to choose an option
-    inquirer
-        .prompt([
-            {
-                type: "rawlist",
-                message: "Select option",
-                choices: options,
-                name: "userOption"
-            }
-        ]).then(function (resultOption) {
-            //node liri.js movie-this  enter-movie-name
-            if (resultOption.userOption === options[0]) {
-                bandsintown();
-                //node liri.js movie-this  enter-band/artist-name
-            } else if (resultOption.userOption === options[2]) {
-
-                movies();
-            }
-            else if (resultOption.userOption === options[1]) {
-                spotifySong();
-            }
-        });
-}
-selectOption();
-
-// var inputType = process.argv[2];
-
-var spotify = new Spotify({
-    id: keys.spotify.id,
-    secret: keys.spotify.secret
-})
-// console.log(data);
-
+//spotify
 var spotifySong = function () {
     inquirer
         .prompt([
@@ -140,10 +67,10 @@ var spotifySong = function () {
                 name: "songName"
             }
         ]).then(function (resultSongInfo) {
-           
+
             spotify.search({ type: "track", query: "'" + resultSongInfo.songName + "'", limit: 1 }, function (err, data) {
 
-                console.log(data.tracks.items[0]);
+                // console.log(data.tracks.items[0]);
 
                 var songResult = data.tracks.items[0];
 
@@ -160,4 +87,83 @@ var spotifySong = function () {
         )
 }
 
-// console.log(`This is my Spotify id ${keys.spotify.id}`);
+// movies function
+var movies = function () {
+
+    inquirer
+        .prompt([
+            {
+                type: "input",
+                message: "Which movie do you want to know about",
+                name: "NameOfMovie"
+            }
+        ]).then(function (resultMovie) {
+
+            if (resultMovie.NameOfMovie) {
+                var queryURL = "http://www.omdbapi.com/?t=" + resultMovie.NameOfMovie.split(" ").join("+") + "&y=&plot=short&apikey=trilogy";
+                // console.log(queryURL);
+            } else {
+                var queryURL = "http://www.omdbapi.com/?t=Mr.+Nobody&y=&plot=short&apikey=trilogy"
+            }
+
+            axios.get(queryURL)
+                .then(
+                    function (responseMovie) {
+
+                        console.log("Title of the movie: " + responseMovie.data.Title + "\n\n" +
+                            "Year the movie came out: " + responseMovie.data.Year + "\n\n" +
+                            "IMDB Rating of the movie: " + responseMovie.data.Rated + "\n\n" +
+                            "Rotten Tomatoes Rating of the movie: " + responseMovie.data.Ratings[1].Value + "\n\n" +
+                            "Country where the movie was produced: " + responseMovie.data.Country + "\n\n" +
+                            "Language of the movie: " + responseMovie.data.Language + "\n\n" +
+                            "Plot of the movie: " + responseMovie.data.Plot + "\n\n" +
+                            "Actors in the movie: " + responseMovie.data.Actors + "\n\n"
+                        );
+                        selectOption()
+                    })
+                .catch(function () {
+
+                    console.log("Enter Correct movie Name");
+
+                    if (NameOfMovie === "Mr. Nobody") {
+                        console.log("If you havn't watch this movie, Watch it")
+                    }
+                });
+        });
+}
+
+//for user to select option
+var selectOption = function () {
+    // ask the user to choose an option
+    inquirer
+        .prompt([
+            {
+                type: "rawlist",
+                message: "Select option",
+                choices: options,
+                name: "userOption"
+            }
+        ]).then(function (resultOption) {
+            //node liri.js movie-this  enter-movie-name
+            if (resultOption.userOption === options[0]) {
+                bandsintown();
+                //node liri.js movie-this  enter-band/artist-name
+            } else if (resultOption.userOption === options[1]) {
+                spotifySong();
+            }
+            else if (resultOption.userOption === options[2]) {
+                movies();
+            } else if (resultOption.userOption === options[3]) {
+                whatUserSay();
+            }
+        });
+}
+selectOption();
+
+var whatUserSay = function () {
+    fs.readFile("random.txt", "utf8", function (error, data) {
+        if (!error);
+        console.log(data.toString());
+        var perCommand = data.toString().split(',');
+    });
+} 
