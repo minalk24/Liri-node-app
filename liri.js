@@ -13,7 +13,7 @@ var searchTerm;
 
 //require variable
 var keys = require("./keys.js");  // code required to import the keys.js file and store it in a variable
-console.log(keys);
+//console.log(keys);
 var spotify = new Spotify(keys.spotify); // to access your keys information
 
 var options = ["concert-this", "spotify-this-song", "movie-this", "do-what-it-says"];
@@ -46,13 +46,15 @@ var bandsintown = function (search) {
                     if (responseAxios.data.length === 0) {
                         console.log("Sorry Enter correct Band Name or Artist Name");
                     } else {
+                        
                         for (var i = 0; i < responseAxios.data.length; i++) {
                             console.log(" The name of the venue is :" + responseAxios.data[i].venue.name + "\n\n" +
                                 "Venue location : " + responseAxios.data[i].venue.city + "\n\n" +
                                 "Date of the Event" + moment(responseAxios.data[i].datetime).format("MM/DD/YYYY HH:mm A")
                             ); //console close
                         } // for loop close
-                    } //else close
+                       
+                    } //else close 
                     selectOption()
                 }); //promise for axios close
         }); //promise for inquirer close
@@ -66,6 +68,7 @@ var spotifySong = function (search) {
 
             // console.log(data.tracks.items[0]);
             var songResult = data.tracks.items[0];
+
             console.log("Artists: " + songResult.artists[0].name + "\n\n" +
                 "Name of the song: " + songResult.name + "\n\n" +
                 "Spotify link of the song: " + songResult.external_urls.spotify + "\n\n" +
@@ -96,6 +99,7 @@ var spotifySong = function (search) {
                         "Spotify link of the song: " + songResult.external_urls.spotify + "\n\n" +
                         "Name of the album: " + songResult.album.name + "\n\n"
                     );
+                   
                     selectOption()
 
                 });
@@ -106,7 +110,7 @@ var spotifySong = function (search) {
 }
 
 // movies function
-var movies = function (cmd) {
+var movies = function () {
 
     inquirer
         .prompt([
@@ -157,7 +161,7 @@ var selectOption = function () {
         .prompt([
             {
                 type: "list",
-                message: "Select option",
+                message: "Select option" + "\n",
                 choices: options,
                 name: "userOption"
             }
@@ -185,6 +189,7 @@ var whatUserSay = function () {
         }
         var inputs = data.split(",");
         console.log(inputs);
+
         var command = inputs[0];
         searchTerm = inputs[1];
 

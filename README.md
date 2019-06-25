@@ -13,7 +13,7 @@
 
 ## LIRI Bot in Action:
 
-![demo gif](/LiriBotDemo.gif "Demo GIF")
+![demo gif](images/liribotdemo.gif "Demo GIF")
  
 
 ## Author
